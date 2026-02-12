@@ -39,7 +39,7 @@
   "bugs": {
     "url": "https://github.com/frzkn/react-native-spoiler-view/issues"
   },
-  "homepage": "https://github.com/frzkn/react-native-spoiler-view#readme",
+  "homepage": "https://frzkn.github.io/react-native-spoiler-view",
   "peerDependencies": {
     "@shopify/react-native-skia": ">=1.0.0",
     "react": ">=18.0.0",

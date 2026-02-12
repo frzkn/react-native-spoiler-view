@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Telegram-style spoiler effect for React Native">
+  <title>react-native-spoiler-view</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.7;
+      color: #24292f;
+      background: #fff;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+    }
+
+    h1 {
+      font-size: 32px;
+      font-weight: 600;
+      letter-spacing: -0.5px;
+      margin-bottom: 12px;
+    }
+
+    .description {
+      color: #57606a;
+      margin-bottom: 24px;
+    }
+
+    .links {
+      margin-bottom: 40px;
+      font-size: 14px;
+    }
+
+    .links a {
+      color: #57606a;
+      text-decoration: none;
+      margin-right: 16px;
+    }
+
+    .links a:hover {
+      color: #24292f;
+    }
+
+    .demos {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 40px;
+    }
+
+    .demos img {
+      width: 240px;
+      border-radius: 8px;
+      border: 1px solid #d1d5da;
+    }
+
+    .features {
+      list-style: none;
+      margin-bottom: 48px;
+      font-size: 15px;
+      color: #57606a;
+    }
+
+    .features li {
+      margin-bottom: 6px;
+    }
+
+    .features li::before {
+      content: "·";
+      margin-right: 8px;
+      color: #d1d5da;
+    }
+
+    h2 {
+      font-size: 20px;
+      font-weight: 600;
+      margin-top: 48px;
+      margin-bottom: 16px;
+    }
+
+    h3 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-top: 24px;
+      margin-bottom: 12px;
+    }
+
+    p {
+      margin-bottom: 16px;
+      color: #57606a;
+    }
+
+    a {
+      color: #0969da;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    pre {
+      position: relative;
+      background: #f6f8fa;
+      border-radius: 6px;
+      padding: 16px;
+      overflow-x: auto;
+      margin: 12px 0 16px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .copy-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      padding: 4px 8px;
+      font-size: 12px;
+      color: #57606a;
+      background: #fff;
+      border: 1px solid #d1d5da;
+      border-radius: 4px;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+
+    pre:hover .copy-btn {
+      opacity: 1;
+    }
+
+    .copy-btn:hover {
+      background: #f3f4f6;
+    }
+
+    .copy-btn.copied {
+      color: #1a7f37;
+    }
+
+    code {
+      font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+    }
+
+    p code {
+      background: #f6f8fa;
+      padding: 3px 6px;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 14px;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 10px 12px;
+      border-top: 1px solid #d1d5da;
+    }
+
+    th {
+      font-weight: 600;
+      background: #f6f8fa;
+    }
+
+    td code {
+      background: #f6f8fa;
+      padding: 2px 5px;
+      border-radius: 3px;
+      font-size: 13px;
+    }
+
+    .footer {
+      margin-top: 64px;
+      padding-top: 24px;
+      border-top: 1px solid #d1d5da;
+      font-size: 13px;
+      color: #8b949e;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>react-native-spoiler-view</h1>
+    <p class="description">Telegram-style spoiler effect for React Native. Tap to reveal content with animated particle burst.</p>
+
+    <div class="links">
+      <a href="https://github.com/frzkn/react-native-spoiler-view">GitHub</a>
+      <a href="https://www.npmjs.com/package/react-native-spoiler-view">npm</a>
+    </div>
+
+    <div class="demos">
+      <img src="_media/demo1.gif" alt="Demo" />
+      <img src="_media/demo2.gif" alt="Demo" />
+    </div>
+
+    <ul class="features">
+      <li>Particle burst from touch point</li>
+      <li>60fps Skia-powered animations</li>
+      <li>Fully customizable</li>
+      <li>iOS and Android</li>
+    </ul>
+
+    <h2>Installation</h2>
+    <pre><code class="language-bash">npm install react-native-spoiler-view</code></pre>
+
+    <h3>Peer Dependencies</h3>
+    <pre><code class="language-bash">npm install @shopify/react-native-skia react-native-reanimated react-native-gesture-handler</code></pre>
+    <p>Setup: <a href="https://shopify.github.io/react-native-skia/docs/getting-started/installation">Skia</a> · <a href="https://docs.swmansion.com/react-native-reanimated/docs/fundamentals/getting-started">Reanimated</a> · <a href="https://docs.swmansion.com/react-native-gesture-handler/docs/fundamentals/installation">Gesture Handler</a></p>
+
+    <h2>Usage</h2>
+
+    <h3>Basic</h3>
+    <pre><code class="language-tsx">import { SpoilerView } from 'react-native-spoiler-view';
+
+&lt;SpoilerView&gt;
+  &lt;Text&gt;This is a secret message!&lt;/Text&gt;
+&lt;/SpoilerView&gt;</code></pre>
+
+    <h3>Controlled</h3>
+    <pre><code class="language-tsx">const [revealed, setRevealed] = useState(false);
+
+&lt;SpoilerView
+  revealed={revealed}
+  onReveal={() =&gt; setRevealed(true)}
+&gt;
+  &lt;Text&gt;Hidden until revealed&lt;/Text&gt;
+&lt;/SpoilerView&gt;
+
+&lt;Button title="Reveal" onPress={() =&gt; setRevealed(true)} /&gt;</code></pre>
+
+    <h3>Custom Config</h3>
+    <pre><code class="language-tsx">&lt;SpoilerView
+  config={{
+    particleCount: 300,
+    particleColor: 'rgba(255, 100, 100, 1)',
+    revealDuration: 400,
+  }}
+&gt;
+  &lt;Image source={secretImage} /&gt;
+&lt;/SpoilerView&gt;</code></pre>
+
+    <h2>Props</h2>
+    <table>
+      <tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr>
+      <tr><td><code>children</code></td><td>ReactNode</td><td>required</td><td>Content to hide</td></tr>
+      <tr><td><code>revealed</code></td><td>boolean</td><td>—</td><td>Controlled reveal state</td></tr>
+      <tr><td><code>enabled</code></td><td>boolean</td><td>true</td><td>Enable tap gesture</td></tr>
+      <tr><td><code>onReveal</code></td><td>() =&gt; void</td><td>—</td><td>Called when revealed</td></tr>
+      <tr><td><code>onHide</code></td><td>() =&gt; void</td><td>—</td><td>Called when hidden</td></tr>
+      <tr><td><code>config</code></td><td>SpoilerConfig</td><td>—</td><td>Customize appearance</td></tr>
+      <tr><td><code>style</code></td><td>ViewStyle</td><td>—</td><td>Container style</td></tr>
+    </table>
+
+    <h2>Config</h2>
+    <pre><code class="language-typescript">{
+  particleCount: 200,
+  particleDensity: 0.08,
+  particleSizeRange: [0.4, 0.9],
+  particleColor: 'rgba(80, 80, 80, 1)',
+  overlayColor: 'transparent',
+  revealDuration: 600,
+  burstSpeed: 150,
+}</code></pre>
+
+    <div class="footer">MIT License</div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-markup.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-typescript.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-jsx.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-tsx.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-bash.min.js"></script>
+  <script>
+    document.querySelectorAll('pre').forEach(pre => {
+      const btn = document.createElement('button');
+      btn.className = 'copy-btn';
+      btn.textContent = 'Copy';
+      btn.onclick = () => {
+        const code = pre.querySelector('code').textContent;
+        navigator.clipboard.writeText(code).then(() => {
+          btn.textContent = 'Copied';
+          btn.classList.add('copied');
+          setTimeout(() => {
+            btn.textContent = 'Copy';
+            btn.classList.remove('copied');
+          }, 2000);
+        });
+      };
+      pre.appendChild(btn);
+    });
+  </script>
+</body>
+</html>

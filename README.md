@@ -2,6 +2,11 @@
 
 Telegram-style spoiler effect for React Native. Hide sensitive content behind animated particles that burst away on tap.
 
+<p align="center">
+  <img src="demo1.gif" alt="Demo 1" width="280" />
+  <img src="demo2.gif" alt="Demo 2" width="280" />
+</p>
+
 ## Features
 
 - Tap to reveal with particle burst from touch point

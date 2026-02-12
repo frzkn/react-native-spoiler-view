@@ -1,6 +1,6 @@
 {
   "name": "react-native-spoiler-view",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Telegram-style spoiler effect for React Native with particle burst animations",
   "main": "lib/commonjs/index.js",
   "module": "lib/module/index.js",

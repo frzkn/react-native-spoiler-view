@@ -1,0 +1,69 @@
+{
+  "name": "react-native-spoiler-view",
+  "version": "1.0.0",
+  "description": "Telegram-style spoiler effect for React Native with particle burst animations",
+  "main": "lib/commonjs/index.js",
+  "module": "lib/module/index.js",
+  "types": "lib/typescript/index.d.ts",
+  "react-native": "src/index.ts",
+  "source": "src/index.ts",
+  "files": [
+    "src",
+    "lib",
+    "!**/__tests__"
+  ],
+  "scripts": {
+    "build": "bob build",
+    "typescript": "tsc --noEmit",
+    "prepare": "bob build"
+  },
+  "keywords": [
+    "react-native",
+    "spoiler",
+    "blur",
+    "reveal",
+    "telegram",
+    "particles",
+    "animation",
+    "skia"
+  ],
+  "author": {
+    "name": "Faraz Khan",
+    "email": "farazrk001@gmail.com"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/frzkn/react-native-spoiler-view.git"
+  },
+  "bugs": {
+    "url": "https://github.com/frzkn/react-native-spoiler-view/issues"
+  },
+  "homepage": "https://github.com/frzkn/react-native-spoiler-view#readme",
+  "peerDependencies": {
+    "@shopify/react-native-skia": ">=1.0.0",
+    "react": ">=18.0.0",
+    "react-native": ">=0.70.0",
+    "react-native-gesture-handler": ">=2.0.0",
+    "react-native-reanimated": ">=3.0.0"
+  },
+  "devDependencies": {
+    "@shopify/react-native-skia": "^1.0.0",
+    "@types/react": "^18.0.0",
+    "react": "^18.0.0",
+    "react-native": "^0.73.0",
+    "react-native-builder-bob": "^0.23.0",
+    "react-native-gesture-handler": "^2.0.0",
+    "react-native-reanimated": "^3.0.0",
+    "typescript": "^5.0.0"
+  },
+  "react-native-builder-bob": {
+    "source": "src",
+    "output": "lib",
+    "targets": [
+      "commonjs",
+      "module",
+      "typescript"
+    ]
+  }
+}

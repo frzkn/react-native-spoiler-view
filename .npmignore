@@ -1,0 +1,6 @@
+example/
+.github/
+*.md
+!README.md
+tsconfig.json
+.gitignore

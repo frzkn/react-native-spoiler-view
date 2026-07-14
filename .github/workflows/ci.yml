@@ -61,6 +61,8 @@ jobs:
       - run: npm ci
       - run: npm ci
         working-directory: example
+      - run: ./gradlew :react-native-spoiler-view:lintRelease
+        working-directory: example/android
       - run: ./gradlew app:assembleRelease
         working-directory: example/android
       - if: always()

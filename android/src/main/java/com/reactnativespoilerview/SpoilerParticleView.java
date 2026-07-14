@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Shader;
+import android.os.Build;
 import android.view.Choreographer;
 import android.view.View;
 
@@ -235,8 +236,8 @@ final class SpoilerParticleView extends View {
     if (bitmap != shaderBitmap) {
       shaderBitmap = bitmap;
       ambientShader = new BitmapShader(bitmap, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
-      int offsetX = Math.floorMod(seed * 37, Math.max(1, bitmap.getWidth()));
-      int offsetY = Math.floorMod(seed * 53, Math.max(1, bitmap.getHeight()));
+      int offsetX = positiveModulo(seed * 37, Math.max(1, bitmap.getWidth()));
+      int offsetY = positiveModulo(seed * 53, Math.max(1, bitmap.getHeight()));
       shaderMatrix.setTranslate(offsetX, offsetY);
       ambientShader.setLocalMatrix(shaderMatrix);
     }
@@ -431,7 +432,14 @@ final class SpoilerParticleView extends View {
   }
 
   private boolean isMotionReduced() {
-    return reduceMotion || ValueAnimator.getDurationScale() == 0f;
+    return reduceMotion
+        || (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+            && !ValueAnimator.areAnimatorsEnabled());
+  }
+
+  private static int positiveModulo(int value, int modulus) {
+    int remainder = value % modulus;
+    return remainder < 0 ? remainder + modulus : remainder;
   }
 
   private static float smoothstep(float edge0, float edge1, float value) {

@@ -76,4 +76,3 @@ tmp/
 *.orig
 *.rej
 *.patch
-/docs/decisions/

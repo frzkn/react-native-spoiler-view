@@ -209,4 +209,34 @@ describe('SpoilerView', () => {
 
     expect(revealedContainer.props.accessibilityHint).toBe('');
   });
+
+  it('lets screen-reader users hide revealed content', () => {
+    const onHide = jest.fn();
+    let renderer: TestRenderer.ReactTestRenderer;
+
+    act(() => {
+      renderer = TestRenderer.create(
+        <SpoilerView revealed onHide={onHide}>
+          {secret()}
+        </SpoilerView>,
+      );
+    });
+
+    const hideControl = renderer!.root.find(
+      (node) => node.props.accessibilityLabel === 'Hide content',
+    );
+
+    expect(hideControl.props.accessibilityHint).toBe('Double tap to hide');
+    expect(hideControl.props.accessibilityActions).toEqual([
+      { name: 'activate' },
+    ]);
+
+    act(() => {
+      hideControl.props.onAccessibilityAction({
+        nativeEvent: { actionName: 'activate' },
+      });
+    });
+
+    expect(onHide).toHaveBeenCalledTimes(1);
+  });
 });

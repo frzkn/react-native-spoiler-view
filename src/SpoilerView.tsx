@@ -30,9 +30,17 @@ const styles = StyleSheet.create({
   hiddenParticles: {
     opacity: 0,
   },
+  accessibilityHideControl: {
+    height: 1,
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    width: 1,
+  },
 });
 
 const captureTouch = () => true;
+const accessibilityActivateAction = [{ name: 'activate' }];
 
 /**
  * SpoilerView - Telegram-style spoiler effect component.
@@ -65,6 +73,8 @@ export function SpoilerView({
   style,
   accessibilityRevealLabel = 'Hidden content',
   accessibilityRevealHint = 'Double tap to reveal',
+  accessibilityHideLabel = 'Hide content',
+  accessibilityHideHint = 'Double tap to hide',
 }: SpoilerViewProps) {
   const config = useMemo<SpoilerConfig>(
     () => normalizeSpoilerConfig(partialConfig),
@@ -117,6 +127,20 @@ export function SpoilerView({
   );
 
   const { gesture } = useRevealGesture({ enabled, onPress: handlePress });
+
+  const handleAccessibilityHide = useCallback(
+    () => handlePress(dimensions.width / 2, dimensions.height / 2),
+    [dimensions.height, dimensions.width, handlePress],
+  );
+
+  const handleAccessibilityAction = useCallback(
+    (event: { nativeEvent: { actionName: string } }) => {
+      if (event.nativeEvent.actionName === 'activate') {
+        handleAccessibilityHide();
+      }
+    },
+    [handleAccessibilityHide],
+  );
 
   useEffect(() => {
     if (isRevealed) {
@@ -222,6 +246,20 @@ export function SpoilerView({
             accessible={false}
             importantForAccessibility="no"
             onStartShouldSetResponder={captureTouch}
+          />
+        )}
+
+        {enabled && isRevealed && (
+          <View
+            style={styles.accessibilityHideControl}
+            accessible
+            accessibilityRole="button"
+            accessibilityLabel={accessibilityHideLabel}
+            accessibilityHint={accessibilityHideHint}
+            accessibilityState={{ expanded: true }}
+            accessibilityActions={accessibilityActivateAction}
+            onAccessibilityAction={handleAccessibilityAction}
+            onAccessibilityTap={handleAccessibilityHide}
           />
         )}
       </View>

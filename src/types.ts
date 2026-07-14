@@ -82,6 +82,10 @@ export interface SpoilerViewProps {
   accessibilityRevealLabel?: string;
   /** Screen-reader hint used while the content is hidden */
   accessibilityRevealHint?: string;
+  /** Screen-reader label for hiding revealed content */
+  accessibilityHideLabel?: string;
+  /** Screen-reader hint for hiding revealed content */
+  accessibilityHideHint?: string;
 }
 
 /** @deprecated Particle generation is native as of 0.1.0. */

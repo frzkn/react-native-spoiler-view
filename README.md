@@ -137,6 +137,8 @@ In controlled mode, callbacks request a state change. The component animates onl
 | `style` | `StyleProp<ViewStyle>` | — | Container style |
 | `accessibilityRevealLabel` | `string` | `Hidden content` | Label announced while hidden |
 | `accessibilityRevealHint` | `string` | `Double tap to reveal` | Reveal action hint |
+| `accessibilityHideLabel` | `string` | `Hide content` | Action label exposed while revealed |
+| `accessibilityHideHint` | `string` | `Double tap to hide` | Hide action hint |
 
 ## Configuration
 

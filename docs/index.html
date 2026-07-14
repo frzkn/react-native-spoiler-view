@@ -256,22 +256,28 @@
     <table>
       <tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr>
       <tr><td><code>children</code></td><td>ReactNode</td><td>required</td><td>Content to hide</td></tr>
-      <tr><td><code>revealed</code></td><td>boolean</td><td>—</td><td>Controlled reveal state</td></tr>
+      <tr><td><code>revealed</code></td><td>boolean</td><td>uncontrolled</td><td>Controlled reveal state</td></tr>
       <tr><td><code>enabled</code></td><td>boolean</td><td>true</td><td>Enable tap gesture</td></tr>
-      <tr><td><code>onReveal</code></td><td>() =&gt; void</td><td>—</td><td>Called when revealed</td></tr>
-      <tr><td><code>onHide</code></td><td>() =&gt; void</td><td>—</td><td>Called when hidden</td></tr>
-      <tr><td><code>config</code></td><td>SpoilerConfig</td><td>—</td><td>Customize appearance</td></tr>
-      <tr><td><code>style</code></td><td>ViewStyle</td><td>—</td><td>Container style</td></tr>
+      <tr><td><code>onReveal</code></td><td>() =&gt; void</td><td>none</td><td>Reveal request callback</td></tr>
+      <tr><td><code>onHide</code></td><td>() =&gt; void</td><td>none</td><td>Hide request callback</td></tr>
+      <tr><td><code>config</code></td><td>Partial&lt;SpoilerConfig&gt;</td><td>none</td><td>Particle and animation overrides</td></tr>
+      <tr><td><code>style</code></td><td>StyleProp&lt;ViewStyle&gt;</td><td>none</td><td>Container style</td></tr>
+      <tr><td><code>accessibilityRevealLabel</code></td><td>string</td><td>Hidden content</td><td>Label announced while hidden</td></tr>
+      <tr><td><code>accessibilityRevealHint</code></td><td>string</td><td>Double tap to reveal</td><td>Reveal action hint</td></tr>
+      <tr><td><code>accessibilityHideLabel</code></td><td>string</td><td>Hide content</td><td>Action label exposed while revealed</td></tr>
+      <tr><td><code>accessibilityHideHint</code></td><td>string</td><td>Double tap to hide</td><td>Hide action hint</td></tr>
     </table>
 
     <h2>Config</h2>
     <pre><code class="language-typescript">{
-  particleCount: 200,
-  particleDensity: 0.08,
-  particleSizeRange: [0.4, 0.9],
+  particleCount: 180,
+  particleDensity: 0.055,
+  particleSizeRange: [0.45, 0.8],
   particleColor: 'rgba(80, 80, 80, 1)',
   overlayColor: 'transparent',
-  revealDuration: 600,
+  noiseSpeed: 0.3,
+  driftAmount: 1,
+  revealDuration: 500,
 }</code></pre>
 
     <div class="footer">MIT License</div>

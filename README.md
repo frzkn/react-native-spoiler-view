@@ -3,8 +3,7 @@
 Telegram-style spoiler content for React Native, rendered with native particles.
 
 <p align="center">
-  <img src="demo1.gif" alt="Text spoiler reveal" width="280" />
-  <img src="demo2.gif" alt="Image spoiler reveal" width="280" />
+  <img src="demo.webp" alt="Native spoiler particles revealing chat messages and private values" width="320" />
 </p>
 
 ## Features

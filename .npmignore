@@ -4,3 +4,7 @@ example/
 !README.md
 tsconfig.json
 .gitignore
+**/build/
+**/.gradle/
+**/.cxx/
+coverage/

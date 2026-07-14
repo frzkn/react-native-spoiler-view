@@ -63,6 +63,9 @@ jobs:
         working-directory: example
       - run: ./gradlew app:assembleRelease
         working-directory: example/android
+      - if: always()
+        run: ./gradlew --stop
+        working-directory: example/android
 
   ios-release:
     runs-on: macos-15

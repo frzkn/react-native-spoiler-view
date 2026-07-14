@@ -11,6 +11,7 @@ final class SpoilerRevealView extends ReactViewGroup {
   private float originX = 0.5f;
   private float originY = 0.5f;
   private float progress = 0f;
+  private boolean hiding;
 
   SpoilerRevealView(Context context) {
     super(context);
@@ -29,7 +30,13 @@ final class SpoilerRevealView extends ReactViewGroup {
   }
 
   void setProgress(float value) {
-    progress = clamp(value);
+    float next = clamp(value);
+    if (next < progress - 0.0001f) {
+      hiding = true;
+    } else if (next > progress + 0.0001f) {
+      hiding = false;
+    }
+    progress = next;
     updateClipping();
     invalidateOutline();
   }
@@ -40,7 +47,8 @@ final class SpoilerRevealView extends ReactViewGroup {
   }
 
   private void updateClipping() {
-    setClipToOutline(progress < 0.999f);
+    setAlpha(hiding ? progress : 1f);
+    setClipToOutline(!hiding && progress < 0.999f);
   }
 
   private static float clamp(float value) {

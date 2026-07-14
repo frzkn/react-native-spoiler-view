@@ -16,7 +16,15 @@ const mockParticleSystem = {
 let mockGesturePress: ((x: number, y: number) => void) | undefined;
 
 jest.mock('../hooks/useParticleSystem', () => ({
-  useParticleSystem: () => mockParticleSystem,
+  useParticleSystem: () => ({
+    ...mockParticleSystem,
+    triggerHide: () => mockTriggerHide(),
+    triggerReveal: (
+      x: number,
+      y: number,
+      onComplete?: () => void,
+    ) => mockTriggerReveal(x, y, onComplete),
+  }),
 }));
 
 jest.mock('../hooks/useRevealGesture', () => ({
@@ -40,6 +48,19 @@ jest.mock('react-native-gesture-handler', () => ({
 
 function secret() {
   return <Text>classified</Text>;
+}
+
+function layout(
+  renderer: TestRenderer.ReactTestRenderer,
+  width = 100,
+  height = 40,
+) {
+  const container = renderer.root.find(
+    (node) => typeof node.props.onLayout === 'function',
+  );
+  act(() => {
+    container.props.onLayout({ nativeEvent: { layout: { width, height } } });
+  });
 }
 
 describe('SpoilerView', () => {
@@ -84,6 +105,7 @@ describe('SpoilerView', () => {
         </SpoilerView>,
       );
     });
+    layout(renderer!);
     act(() => mockGesturePress?.(24, 16));
     mockTriggerReveal.mockClear();
 
@@ -110,6 +132,7 @@ describe('SpoilerView', () => {
         <SpoilerView revealed={false}>{secret()}</SpoilerView>,
       );
     });
+    layout(renderer!);
     act(() => {
       renderer.update(<SpoilerView revealed>{secret()}</SpoilerView>);
     });
@@ -145,6 +168,7 @@ describe('SpoilerView', () => {
         <SpoilerView revealed={false}>{secret()}</SpoilerView>,
       );
     });
+    layout(renderer!);
     act(() => {
       renderer.update(<SpoilerView revealed>{secret()}</SpoilerView>);
     });
@@ -156,10 +180,36 @@ describe('SpoilerView', () => {
     expect(mockTriggerHide).toHaveBeenCalledTimes(2);
   });
 
-  it('owns state internally when the revealed prop is absent', () => {
+  it('starts an initial reveal after layout without restarting on resize', () => {
+    let renderer: TestRenderer.ReactTestRenderer;
+
     act(() => {
-      TestRenderer.create(<SpoilerView>{secret()}</SpoilerView>);
+      renderer = TestRenderer.create(
+        <SpoilerView revealed>{secret()}</SpoilerView>,
+      );
     });
+
+    expect(mockTriggerReveal).not.toHaveBeenCalled();
+    layout(renderer!);
+
+    expect(mockTriggerReveal).toHaveBeenCalledWith(
+      50,
+      20,
+      expect.any(Function),
+    );
+
+    layout(renderer!, 200, 80);
+
+    expect(mockTriggerReveal).toHaveBeenCalledTimes(1);
+  });
+
+  it('owns state internally when the revealed prop is absent', () => {
+    let renderer: TestRenderer.ReactTestRenderer;
+
+    act(() => {
+      renderer = TestRenderer.create(<SpoilerView>{secret()}</SpoilerView>);
+    });
+    layout(renderer!);
     mockTriggerReveal.mockClear();
 
     act(() => mockGesturePress?.(10, 20));

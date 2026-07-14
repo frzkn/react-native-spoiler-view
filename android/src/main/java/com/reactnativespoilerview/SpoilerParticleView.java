@@ -96,7 +96,7 @@ final class SpoilerParticleView extends View {
     }
     updateTextureRegistration();
     invalidate();
-    restartRevealTicker();
+    updateRevealTicker();
   }
 
   void setParticleCount(int value) {
@@ -166,7 +166,7 @@ final class SpoilerParticleView extends View {
     if (reduceMotion == value) return;
     reduceMotion = value;
     updateTextureRegistration();
-    restartRevealTicker();
+    updateRevealTicker();
     invalidate();
   }
 
@@ -175,7 +175,7 @@ final class SpoilerParticleView extends View {
     super.onAttachedToWindow();
     rebuildParticles();
     updateTextureRegistration();
-    restartRevealTicker();
+    updateRevealTicker();
   }
 
   @Override
@@ -200,14 +200,14 @@ final class SpoilerParticleView extends View {
   protected void onWindowVisibilityChanged(int visibility) {
     super.onWindowVisibilityChanged(visibility);
     updateTextureRegistration();
-    restartRevealTicker();
+    updateRevealTicker();
   }
 
   @Override
   protected void onVisibilityChanged(View changedView, int visibility) {
     super.onVisibilityChanged(changedView, visibility);
     updateTextureRegistration();
-    restartRevealTicker();
+    updateRevealTicker();
   }
 
   @Override
@@ -259,7 +259,7 @@ final class SpoilerParticleView extends View {
       float sizeFraction = sizeBucket / (float) (SIZE_BUCKET_COUNT - 1);
       float radius = minimumSize + (maximumSize - minimumSize) * sizeFraction;
       particlePaint.setStrokeWidth(Math.max(1f, radius * density * 2f));
-      for (int alphaBucket = 0; alphaBucket < ALPHA_BUCKET_COUNT; alphaBucket += 1) {
+      for (int alphaBucket = 1; alphaBucket < ALPHA_BUCKET_COUNT; alphaBucket += 1) {
         int bucket = sizeBucket * ALPHA_BUCKET_COUNT + alphaBucket;
         int pointCount = bucketPointCounts[bucket];
         if (pointCount == 0) continue;
@@ -313,6 +313,7 @@ final class SpoilerParticleView extends View {
       int alphaBucket = Math.min(
           ALPHA_BUCKET_COUNT - 1,
           Math.max(0, Math.round(alpha * (ALPHA_BUCKET_COUNT - 1))));
+      if (alphaBucket == 0) continue;
       int bucket = particle.sizeBucket * ALPHA_BUCKET_COUNT + alphaBucket;
       int pointIndex = bucketPointCounts[bucket];
       pointBuckets[bucket][pointIndex * 2] = centerX * density;
@@ -395,9 +396,12 @@ final class SpoilerParticleView extends View {
     textureRegistry.register(this, key, !isMotionReduced());
   }
 
-  private void restartRevealTicker() {
-    stopTicker();
-    if (shouldAnimateReveal()) scheduleFrame();
+  private void updateRevealTicker() {
+    if (shouldAnimateReveal()) {
+      scheduleFrame();
+    } else {
+      stopTicker();
+    }
   }
 
   private void scheduleFrame() {

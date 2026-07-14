@@ -97,6 +97,7 @@ export function SpoilerView({
   const [internalRevealed, setInternalRevealed] = useState(false);
   const [particlesVisible, setParticlesVisible] = useState(true);
   const pendingRevealPoint = useRef<{ x: number; y: number }>();
+  const animatedRevealState = useRef<boolean>();
   const isControlled = controlledRevealed !== undefined;
   const isRevealed = controlledRevealed ?? internalRevealed;
 
@@ -143,6 +144,10 @@ export function SpoilerView({
   );
 
   useEffect(() => {
+    if (animatedRevealState.current === isRevealed) return;
+    if (isRevealed && (dimensions.width <= 0 || dimensions.height <= 0)) return;
+
+    animatedRevealState.current = isRevealed;
     if (isRevealed) {
       const revealPoint = pendingRevealPoint.current ?? {
         x: dimensions.width / 2,

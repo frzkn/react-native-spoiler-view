@@ -103,11 +103,12 @@ static const CGFloat RNSpoilerAmbientVelocityLimit = 2000.0;
   static dispatch_once_t onceToken;
   dispatch_once(&onceToken, ^{
     CGSize size = CGSizeMake(4.0, 4.0);
-    UIGraphicsBeginImageContextWithOptions(size, NO, 0);
-    [UIColor.whiteColor setFill];
-    [[UIBezierPath bezierPathWithOvalInRect:CGRectMake(1.0, 1.0, 2.0, 2.0)] fill];
-    image = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
+    UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:size];
+    image = [renderer imageWithActions:^(UIGraphicsImageRendererContext *context) {
+      (void)context;
+      [UIColor.whiteColor setFill];
+      [[UIBezierPath bezierPathWithOvalInRect:CGRectMake(1.0, 1.0, 2.0, 2.0)] fill];
+    }];
   });
   return image;
 }

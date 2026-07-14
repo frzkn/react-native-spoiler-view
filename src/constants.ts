@@ -1,20 +1,21 @@
 import type { SpoilerConfig } from './types';
 
-/**
- * Alpha tiers for particle depth (matches Telegram Android's ALPHAS array)
- */
+/** Opacity tiers used to give the particle field visual depth. */
 export const ALPHA_TIERS = [0.3, 0.6, 1.0] as const;
 
 /**
  * Default configuration for the spoiler effect.
- * Based on Telegram/spoiled research - small particles, tight drift.
+ * Fine particles with restrained ambient movement.
  */
 export const DEFAULT_CONFIG: SpoilerConfig = {
-  /** Number of particles - higher count with smaller particles */
-  particleCount: 200,
+  /** Canonical per-view target and cap. */
+  particleCount: 180,
 
-  /** Particle size range - very small like Telegram */
-  particleSizeRange: [0.4, 0.9],
+  /** Canonical dust density. Explicit particleCount values disable adaptive density. */
+  particleDensity: 0.055,
+
+  /** Fine speckles rather than visibly circular beads. */
+  particleSizeRange: [0.45, 0.8],
 
   /** Particle color - alpha tiers (0.3, 0.6, 1.0) applied internally for depth */
   particleColor: 'rgba(80, 80, 80, 1)',
@@ -22,15 +23,12 @@ export const DEFAULT_CONFIG: SpoilerConfig = {
   /** Overlay color - transparent by default, particles do the work */
   overlayColor: 'transparent',
 
-  /** Speed of noise field evolution (subtle shimmer) */
+  /** Speed of independent ambient particle motion. */
   noiseSpeed: 0.3,
 
-  /** Pixels of organic drift - very subtle */
+  /** Maximum logical pixels of ambient drift. */
   driftAmount: 1,
 
-  /** Duration of reveal/hide animation in ms (Telegram: ~1000ms, spoilerjs: 300ms) */
-  revealDuration: 600,
-
-  /** Speed of particle burst on reveal - moderate for natural disperse (pixels per second) */
-  burstSpeed: 150,
+  /** Touch-origin reveal duration in ms. */
+  revealDuration: 500,
 };

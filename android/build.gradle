@@ -1,0 +1,27 @@
+buildscript {
+  repositories {
+    google()
+    mavenCentral()
+  }
+}
+
+apply plugin: 'com.android.library'
+
+android {
+  namespace 'com.reactnativespoilerview'
+  compileSdkVersion rootProject.ext.has('compileSdkVersion') ? rootProject.ext.compileSdkVersion : 35
+
+  defaultConfig {
+    minSdkVersion rootProject.ext.has('minSdkVersion') ? rootProject.ext.minSdkVersion : 23
+    targetSdkVersion rootProject.ext.has('targetSdkVersion') ? rootProject.ext.targetSdkVersion : 35
+  }
+}
+
+repositories {
+  google()
+  mavenCentral()
+}
+
+dependencies {
+  implementation 'com.facebook.react:react-native:+'
+}

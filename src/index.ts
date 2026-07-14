@@ -26,3 +26,4 @@ export type {
 
 // Constants for customization reference
 export { DEFAULT_CONFIG, ALPHA_TIERS } from './constants';
+export { MAX_PARTICLE_COUNT } from './config';

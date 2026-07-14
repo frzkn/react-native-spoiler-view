@@ -1,9 +1,9 @@
 import type { ReactNode } from 'react';
-import type { ViewStyle } from 'react-native';
+import type { StyleProp, ViewStyle } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 
 /**
- * Alpha tier for particle depth (matches Telegram's approach)
+ * Alpha tier for particle depth.
  * 0 = light (0.3 opacity), 1 = mid (0.6 opacity), 2 = full (1.0 opacity)
  */
 export type AlphaTier = 0 | 1 | 2;
@@ -16,7 +16,7 @@ export interface Particle {
   baseX: number;
   /** Initial Y position */
   baseY: number;
-  /** Radius in pixels (1.5-3) */
+  /** Radius in logical pixels */
   size: number;
   /** Alpha tier for depth effect (0=light, 1=mid, 2=full) */
   alphaTier: AlphaTier;
@@ -24,9 +24,9 @@ export interface Particle {
   noiseOffsetX: number;
   /** Unique noise seed for Y movement */
   noiseOffsetY: number;
-  /** Burst velocity X (set during reveal) */
+  /** Reveal velocity X retained for compatibility with the legacy Particle shape. */
   velocityX: number;
-  /** Burst velocity Y (set during reveal) */
+  /** Reveal velocity Y retained for compatibility with the legacy Particle shape. */
   velocityY: number;
   /** Lifecycle phase offset (for staggered spawning) */
   life: number;
@@ -42,24 +42,22 @@ export interface Particle {
  * Configuration options for the spoiler effect
  */
 export interface SpoilerConfig {
-  /** Number of particles to render (default: 200). Ignored if density is set. */
+  /** Target count, or per-view cap when particleDensity is set (default: 180). */
   particleCount: number;
-  /** Particles per pixel² (e.g., 0.08). If set, overrides particleCount. */
+  /** Particles per logical pixel² (default: 0.055), bounded by particleCount. */
   particleDensity?: number;
-  /** Min and max particle radius in pixels (default: [1.5, 3]) */
+  /** Min and max particle radius in logical pixels (default: [0.45, 0.8]) */
   particleSizeRange: [number, number];
   /** Particle color - alpha tiers (0.3, 0.6, 1.0) applied internally for depth */
   particleColor: string;
-  /** Overlay color - opaque to hide content (default: 'rgba(180, 180, 180, 0.92)') */
+  /** Canvas background color (default: 'transparent') */
   overlayColor: string;
-  /** Speed of noise evolution (default: 0.3) */
+  /** Speed of independent ambient particle motion (default: 0.3) */
   noiseSpeed: number;
-  /** Pixels of noise-based drift (default: 6) */
+  /** Maximum ambient particle drift in logical pixels (default: 1) */
   driftAmount: number;
-  /** Duration of reveal animation in ms (default: 350) */
+  /** Duration of reveal animation in ms (default: 500) */
   revealDuration: number;
-  /** Speed of particle burst on reveal (default: 180) */
-  burstSpeed: number;
 }
 
 /**
@@ -79,12 +77,14 @@ export interface SpoilerViewProps {
   /** Enable tap gesture to reveal (default: true) */
   enabled?: boolean;
   /** Container style */
-  style?: ViewStyle;
+  style?: StyleProp<ViewStyle>;
+  /** Screen-reader label used while the content is hidden */
+  accessibilityRevealLabel?: string;
+  /** Screen-reader hint used while the content is hidden */
+  accessibilityRevealHint?: string;
 }
 
-/**
- * Internal state managed by useParticleSystem
- */
+/** @deprecated Particle generation is native as of 0.1.0. */
 export interface ParticleSystemState {
   /** All particles as a SharedValue for reactivity */
   particles: SharedValue<Particle[]>;

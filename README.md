@@ -1,58 +1,97 @@
 # react-native-spoiler-view
 
-Telegram-style spoiler effect for React Native. Hide sensitive content behind animated particles that burst away on tap.
+Telegram-style spoiler content for React Native, rendered with native particles.
 
 <p align="center">
-  <img src="demo1.gif" alt="Demo 1" width="280" />
-  <img src="demo2.gif" alt="Demo 2" width="280" />
+  <img src="demo1.gif" alt="Text spoiler reveal" width="280" />
+  <img src="demo2.gif" alt="Image spoiler reveal" width="280" />
 </p>
 
 ## Features
 
-- Tap to reveal with particle burst from touch point
-- Smooth 60fps Skia-powered animations
-- Fully customizable (colors, particle count, speed)
-- Works on iOS and Android
-- Controlled and uncontrolled modes
+- Controlled and uncontrolled reveal state
+- Touch-origin circular reveal
+- Three particle depth/opacity tiers
+- Hidden descendants are blocked from touch, VoiceOver, and TalkBack
+- Runtime-safe configuration with bounded particle work
+- Platform-native particle rendering on iOS and Android
+- Shared Android ambient texture work instead of per-view simulation
+- Core Animation ambient particles on iOS
+
+## Compatibility
+
+The package is maintained against two integration lanes:
+
+| Lane | React Native | React | Reanimated | Gesture Handler |
+| --- | --- | --- | --- | --- |
+| Legacy | 0.73.x | 18.x | 3.15.5 | 2.18.x |
+| Current | 0.86.x | 19.x | 4.5.x + Worklets 0.10.x | 3.x |
+
+Reanimated 4 requires React Native's New Architecture and `react-native-worklets`. Select
+dependency versions that support your React Native version rather than installing unrelated latest
+majors.
 
 ## Installation
 
-```bash
-npm install react-native-spoiler-view
-# or
-yarn add react-native-spoiler-view
-```
-
-### Peer Dependencies
-
-This library requires these peer dependencies:
+Install the component and the compatible native peers:
 
 ```bash
-npm install @shopify/react-native-skia react-native-reanimated react-native-gesture-handler
+npm install react-native-spoiler-view \
+  react-native-reanimated \
+  react-native-gesture-handler
 ```
 
-Follow the installation guides for each:
-- [@shopify/react-native-skia](https://shopify.github.io/react-native-skia/docs/getting-started/installation)
-- [react-native-reanimated](https://docs.swmansion.com/react-native-reanimated/docs/fundamentals/getting-started)
-- [react-native-gesture-handler](https://docs.swmansion.com/react-native-gesture-handler/docs/fundamentals/installation)
+For Reanimated 4, also install Worklets:
+
+```bash
+npm install react-native-worklets
+```
+
+React Native Community CLI apps using Reanimated 4 must put the Worklets plugin last in
+`babel.config.js`:
+
+```js
+module.exports = {
+  presets: ['module:@react-native/babel-preset'],
+  plugins: ['react-native-worklets/plugin'],
+};
+```
+
+Wrap the application near its root with `GestureHandlerRootView`:
+
+```tsx
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+
+export default function App() {
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <YourApp />
+    </GestureHandlerRootView>
+  );
+}
+```
+
+Follow the native installation instructions for
+[Reanimated](https://docs.swmansion.com/react-native-reanimated/docs/fundamentals/getting-started)
+and [Gesture Handler](https://docs.swmansion.com/react-native-gesture-handler/docs/fundamentals/installation),
+then run CocoaPods for iOS.
 
 ## Usage
 
-### Basic (Uncontrolled)
-
-Tap to reveal, tap again to hide:
+### Uncontrolled
 
 ```tsx
+import { Text } from 'react-native';
 import { SpoilerView } from 'react-native-spoiler-view';
 
-<SpoilerView>
-  <Text>This is a secret message!</Text>
-</SpoilerView>
+<SpoilerView accessibilityRevealLabel="Hidden message">
+  <Text>This is a secret message.</Text>
+</SpoilerView>;
 ```
 
-### Controlled Mode
+The component owns its reveal state. Tapping toggles between hidden and revealed.
 
-Control reveal state externally:
+### Controlled
 
 ```tsx
 const [revealed, setRevealed] = useState(false);
@@ -60,14 +99,17 @@ const [revealed, setRevealed] = useState(false);
 <SpoilerView
   revealed={revealed}
   onReveal={() => setRevealed(true)}
+  onHide={() => setRevealed(false)}
+  accessibilityRevealLabel="Hidden account number"
 >
-  <Text>Hidden until revealed</Text>
-</SpoilerView>
-
-<Button title="Reveal" onPress={() => setRevealed(true)} />
+  <Text>1234 5678 9012 3456</Text>
+</SpoilerView>;
 ```
 
-### Custom Styling
+In controlled mode, callbacks request a state change. The component animates only when the
+`revealed` prop changes, so a parent may accept or reject the request without visual desynchronization.
+
+### Custom particles
 
 ```tsx
 <SpoilerView
@@ -76,7 +118,6 @@ const [revealed, setRevealed] = useState(false);
     particleColor: 'rgba(255, 100, 100, 1)',
     particleSizeRange: [0.5, 1.5],
     revealDuration: 400,
-    burstSpeed: 200,
   }}
 >
   <Image source={secretImage} />
@@ -86,35 +127,46 @@ const [revealed, setRevealed] = useState(false);
 ## Props
 
 | Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `children` | `ReactNode` | required | Content to hide |
-| `revealed` | `boolean` | `undefined` | Controlled reveal state |
-| `enabled` | `boolean` | `true` | Enable tap gesture |
-| `onReveal` | `() => void` | - | Called when revealed |
-| `onHide` | `() => void` | - | Called when hidden |
-| `config` | `Partial<SpoilerConfig>` | - | Customize appearance |
-| `style` | `ViewStyle` | - | Container style |
+| --- | --- | --- | --- |
+| `children` | `ReactNode` | required | Content hidden by the spoiler |
+| `revealed` | `boolean` | uncontrolled | Parent-owned reveal state |
+| `enabled` | `boolean` | `true` | Enables reveal/hide gestures |
+| `onReveal` | `() => void` | — | Reveal request callback |
+| `onHide` | `() => void` | — | Hide request callback |
+| `config` | `Partial<SpoilerConfig>` | — | Particle and animation overrides |
+| `style` | `StyleProp<ViewStyle>` | — | Container style |
+| `accessibilityRevealLabel` | `string` | `Hidden content` | Label announced while hidden |
+| `accessibilityRevealHint` | `string` | `Double tap to reveal` | Reveal action hint |
 
-## Config Options
+## Configuration
 
 ```tsx
 interface SpoilerConfig {
-  particleCount: number;      // Number of particles (default: 200)
-  particleDensity?: number;   // Particles per px² (overrides count)
-  particleSizeRange: [number, number]; // [min, max] radius (default: [0.4, 0.9])
-  particleColor: string;      // Particle color (default: 'rgba(80, 80, 80, 1)')
-  overlayColor: string;       // Background overlay (default: 'transparent')
-  revealDuration: number;     // Animation duration in ms (default: 600)
-  burstSpeed: number;         // Particle burst speed (default: 150)
+  particleCount: number;                // Default target/cap 180; maximum 1000
+  particleDensity?: number;             // Default 0.055 per logical px², capped at 1000 total
+  particleSizeRange: [number, number];  // Default [0.45, 0.8]
+  particleColor: string;                // Default rgba(80, 80, 80, 1)
+  overlayColor: string;                 // Default transparent
+  noiseSpeed: number;                   // Ambient motion speed, default 0.3
+  driftAmount: number;                  // Maximum ambient drift, default 1
+  revealDuration: number;               // Default 500 ms
 }
 ```
 
-## How It Works
+Unsafe numeric inputs are normalized at runtime. Particle work is always capped by
+`MAX_PARTICLE_COUNT`, which is exported for consumers that expose configuration controls.
+Providing `particleCount` without `particleDensity` opts into a fixed target. With density,
+`particleCount` is the per-view cap, keeping the canonical dust adaptive without allowing a
+large spoiler to monopolize the frame budget.
 
-- Uses [@shopify/react-native-skia](https://shopify.github.io/react-native-skia/) for high-performance particle rendering
-- Particles are rendered in a single batched draw call for optimal performance
-- Animations run on the UI thread via [react-native-reanimated](https://docs.swmansion.com/react-native-reanimated/) worklets
-- Tap gestures handled by [react-native-gesture-handler](https://docs.swmansion.com/react-native-gesture-handler/)
+## Development
+
+```bash
+npm install
+npm run check
+```
+
+The [`example`](./example) application is the maintained iOS and Android integration harness.
 
 ## License
 

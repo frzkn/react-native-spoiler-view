@@ -194,7 +194,7 @@
 <body>
   <div class="container">
     <h1>react-native-spoiler-view</h1>
-    <p class="description">Telegram-style spoiler effect for React Native. Tap to reveal content with animated particle burst.</p>
+    <p class="description">Telegram-style spoiler effect for React Native. Tap to reveal content with native particle animation.</p>
 
     <div class="links">
       <a href="https://github.com/frzkn/react-native-spoiler-view">GitHub</a>
@@ -207,8 +207,8 @@
     </div>
 
     <ul class="features">
-      <li>Particle burst from touch point</li>
-      <li>60fps Skia-powered animations</li>
+      <li>Touch-origin circular reveal</li>
+      <li>Platform-native particle animations</li>
       <li>Fully customizable</li>
       <li>iOS and Android</li>
     </ul>
@@ -217,8 +217,8 @@
     <pre><code class="language-bash">npm install react-native-spoiler-view</code></pre>
 
     <h3>Peer Dependencies</h3>
-    <pre><code class="language-bash">npm install @shopify/react-native-skia react-native-reanimated react-native-gesture-handler</code></pre>
-    <p>Setup: <a href="https://shopify.github.io/react-native-skia/docs/getting-started/installation">Skia</a> · <a href="https://docs.swmansion.com/react-native-reanimated/docs/fundamentals/getting-started">Reanimated</a> · <a href="https://docs.swmansion.com/react-native-gesture-handler/docs/fundamentals/installation">Gesture Handler</a></p>
+    <pre><code class="language-bash">npm install react-native-reanimated react-native-gesture-handler</code></pre>
+    <p>Setup: <a href="https://docs.swmansion.com/react-native-reanimated/docs/fundamentals/getting-started">Reanimated</a> · <a href="https://docs.swmansion.com/react-native-gesture-handler/docs/fundamentals/installation">Gesture Handler</a></p>
 
     <h2>Usage</h2>
 
@@ -272,7 +272,6 @@
   particleColor: 'rgba(80, 80, 80, 1)',
   overlayColor: 'transparent',
   revealDuration: 600,
-  burstSpeed: 150,
 }</code></pre>
 
     <div class="footer">MIT License</div>

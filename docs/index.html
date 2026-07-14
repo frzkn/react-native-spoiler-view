@@ -218,20 +218,49 @@
     }
 
     .demo-frame {
+      position: relative;
       justify-self: center;
-      width: min(100%, 362px);
-      padding: 12px;
-      border: 1px solid var(--line);
-      border-radius: 34px;
-      background: var(--surface);
-      box-shadow: var(--shadow);
+      width: min(100%, 350px);
+      padding: 8px;
+      border: 2px solid #454951;
+      border-radius: 54px;
+      background: #060708;
+      box-shadow:
+        0 0 0 2px #090a0c,
+        0 0 0 4px #25282e,
+        var(--shadow);
+    }
+
+    .demo-frame::before,
+    .demo-frame::after {
+      content: "";
+      position: absolute;
+      display: block;
+      background: #25282e;
+    }
+
+    .demo-frame::before {
+      top: 96px;
+      left: -9px;
+      width: 5px;
+      height: 30px;
+      border-radius: 3px 0 0 3px;
+      box-shadow: 0 48px 0 #25282e, 0 86px 0 #25282e;
+    }
+
+    .demo-frame::after {
+      top: 150px;
+      right: -9px;
+      width: 5px;
+      height: 82px;
+      border-radius: 0 3px 3px 0;
     }
 
     .demo-frame img {
       display: block;
       width: 100%;
       height: auto;
-      border-radius: 24px;
+      border-radius: 44px;
       background: #08090b;
     }
 
@@ -468,7 +497,7 @@
       }
 
       .demo-frame {
-        width: min(88%, 360px);
+        width: min(86%, 346px);
       }
 
       .proof {
@@ -541,8 +570,8 @@
   <main id="content">
     <section class="shell hero">
       <div class="hero-copy">
-        <h1>Spoilers that feel native.</h1>
-        <p class="lede">Telegram-style hidden content for React Native, rendered with native particles on iOS and Android. Your content stays real, accessible, and interactive after reveal.</p>
+        <h1>React Native spoilers.</h1>
+        <p class="lede">Hide messages, values, images, or custom views with native particle animations on iOS and Android. Supports controlled state, accessibility, and reduced motion.</p>
         <div class="actions">
           <a class="button primary" href="#install">Install v1.0.0</a>
           <a class="button" href="https://github.com/frzkn/react-native-spoiler-view/tree/v1.0.0/example">View the example</a>

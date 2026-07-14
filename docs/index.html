@@ -1,275 +1,666 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Telegram-style spoiler effect for React Native">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Telegram-style spoiler content for React Native, rendered with native particles on iOS and Android.">
+  <meta name="theme-color" content="#0b0c0e" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+  <meta property="og:title" content="react-native-spoiler-view">
+  <meta property="og:description" content="Native, performant spoiler particles for React Native.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://raw.githubusercontent.com/frzkn/react-native-spoiler-view/v1.0.0/demo.webp">
   <title>react-native-spoiler-view</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      color-scheme: light dark;
+      --bg: #ffffff;
+      --surface: #f6f7f9;
+      --surface-strong: #eceef2;
+      --ink: #101216;
+      --muted: #555b66;
+      --line: #d9dde4;
+      --accent: #2864dc;
+      --code: #17191e;
+      --code-ink: #f4f6fa;
+      --shadow: 0 24px 70px rgb(15 23 42 / 18%);
+      --content: 1120px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0b0c0e;
+        --surface: #14161a;
+        --surface-strong: #1d2026;
+        --ink: #f6f7f9;
+        --muted: #aeb4bf;
+        --line: #2a2e35;
+        --accent: #79a7ff;
+        --code: #050607;
+        --code-ink: #f5f7fb;
+        --shadow: 0 28px 90px rgb(0 0 0 / 48%);
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       font-size: 16px;
-      line-height: 1.7;
-      color: #24292f;
-      background: #fff;
+      line-height: 1.65;
       -webkit-font-smoothing: antialiased;
     }
 
-    .container {
-      max-width: 720px;
-      margin: 0 auto;
-      padding: 48px 24px 80px;
-    }
-
-    h1 {
-      font-size: 32px;
-      font-weight: 600;
-      letter-spacing: -0.5px;
-      margin-bottom: 12px;
-    }
-
-    .description {
-      color: #57606a;
-      margin-bottom: 24px;
-    }
-
-    .links {
-      margin-bottom: 40px;
-      font-size: 14px;
-    }
-
-    .links a {
-      color: #57606a;
-      text-decoration: none;
-      margin-right: 16px;
-    }
-
-    .links a:hover {
-      color: #24292f;
-    }
-
-    .demos {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 40px;
-    }
-
-    .demos img {
-      width: 240px;
-      border-radius: 8px;
-      border: 1px solid #d1d5da;
-    }
-
-    .features {
-      list-style: none;
-      margin-bottom: 48px;
-      font-size: 15px;
-      color: #57606a;
-    }
-
-    .features li {
-      margin-bottom: 6px;
-    }
-
-    .features li::before {
-      content: "·";
-      margin-right: 8px;
-      color: #d1d5da;
-    }
-
-    h2 {
-      font-size: 20px;
-      font-weight: 600;
-      margin-top: 48px;
-      margin-bottom: 16px;
-    }
-
-    h3 {
-      font-size: 15px;
-      font-weight: 600;
-      margin-top: 24px;
-      margin-bottom: 12px;
-    }
-
-    p {
-      margin-bottom: 16px;
-      color: #57606a;
-    }
-
     a {
-      color: #0969da;
-      text-decoration: none;
+      color: inherit;
+      text-decoration-color: color-mix(in srgb, currentColor 45%, transparent);
+      text-underline-offset: 0.2em;
     }
 
     a:hover {
-      text-decoration: underline;
+      text-decoration-color: currentColor;
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--accent);
+      outline-offset: 4px;
+      border-radius: 4px;
+    }
+
+    .skip-link {
+      position: fixed;
+      z-index: 10;
+      top: 12px;
+      left: 12px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: var(--ink);
+      color: var(--bg);
+      transform: translateY(-160%);
+    }
+
+    .skip-link:focus {
+      transform: translateY(0);
+    }
+
+    .shell {
+      width: min(calc(100% - 40px), var(--content));
+      margin-inline: auto;
+    }
+
+    .site-header {
+      display: flex;
+      min-height: 76px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand,
+    .header-links {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand {
+      min-width: 0;
+      font-weight: 720;
+      letter-spacing: -0.02em;
+      text-decoration: none;
+    }
+
+    .mark {
+      display: inline-grid;
+      width: 30px;
+      height: 30px;
+      flex: 0 0 auto;
+      place-items: center;
+      border-radius: 9px;
+      background: var(--ink);
+      color: var(--bg);
+      font-size: 17px;
+    }
+
+    .version {
+      padding: 2px 8px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 650;
+      letter-spacing: 0.01em;
+    }
+
+    .header-links a {
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .header-links a:hover {
+      color: var(--ink);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+      gap: clamp(44px, 8vw, 108px);
+      align-items: center;
+      padding-block: clamp(72px, 10vw, 132px);
+    }
+
+    .hero-copy {
+      max-width: 680px;
+    }
+
+    .hero h1 {
+      max-width: 11ch;
+      margin: 0;
+      font-size: clamp(3.25rem, 7.5vw, 5.8rem);
+      font-weight: 760;
+      letter-spacing: -0.04em;
+      line-height: 0.96;
+      text-wrap: balance;
+    }
+
+    .lede {
+      max-width: 55ch;
+      margin: 28px 0 0;
+      color: var(--muted);
+      font-size: clamp(1.08rem, 2vw, 1.28rem);
+      line-height: 1.55;
+      text-wrap: pretty;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 32px;
+    }
+
+    .button {
+      display: inline-flex;
+      min-height: 46px;
+      align-items: center;
+      justify-content: center;
+      padding: 0 18px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: transform 160ms ease-out, border-color 160ms ease-out;
+    }
+
+    .button.primary {
+      border-color: var(--ink);
+      background: var(--ink);
+      color: var(--bg);
+    }
+
+    .button:hover {
+      border-color: var(--muted);
+      transform: translateY(-1px);
+    }
+
+    .demo-frame {
+      justify-self: center;
+      width: min(100%, 362px);
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 34px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .demo-frame img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 24px;
+      background: #08090b;
+    }
+
+    .proof {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      border-block: 1px solid var(--line);
+    }
+
+    .proof-item {
+      padding: 26px clamp(12px, 2.5vw, 30px);
+    }
+
+    .proof-item + .proof-item {
+      border-left: 1px solid var(--line);
+    }
+
+    .proof strong,
+    .proof span {
+      display: block;
+    }
+
+    .proof strong {
+      font-size: 15px;
+    }
+
+    .proof span {
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .section {
+      display: grid;
+      grid-template-columns: minmax(180px, 0.42fr) minmax(0, 1fr);
+      gap: clamp(32px, 7vw, 96px);
+      padding-block: clamp(72px, 9vw, 112px);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .section > * {
+      min-width: 0;
+    }
+
+    .section-heading {
+      position: sticky;
+      top: 28px;
+      align-self: start;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: clamp(1.65rem, 3vw, 2.35rem);
+      line-height: 1.12;
+      letter-spacing: -0.035em;
+      text-wrap: balance;
+    }
+
+    h3 {
+      margin: 36px 0 12px;
+      font-size: 1rem;
+      letter-spacing: -0.01em;
+    }
+
+    h3:first-child {
+      margin-top: 0;
+    }
+
+    p {
+      max-width: 68ch;
+      margin: 0 0 18px;
+      color: var(--muted);
+      text-wrap: pretty;
+    }
+
+    .feature-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      border-top: 1px solid var(--line);
+    }
+
+    .feature-list li {
+      padding: 20px 20px 20px 0;
+      border-bottom: 1px solid var(--line);
+      color: var(--muted);
+    }
+
+    .feature-list li:nth-child(even) {
+      padding-left: 24px;
+      border-left: 1px solid var(--line);
+    }
+
+    .feature-list strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--ink);
+      font-size: 15px;
+    }
+
+    .code-wrap {
+      position: relative;
+      margin: 14px 0 22px;
     }
 
     pre {
-      position: relative;
-      background: #f6f8fa;
-      border-radius: 6px;
-      padding: 16px;
+      margin: 0;
+      padding: 22px;
       overflow-x: auto;
-      margin: 12px 0 16px;
+      border-radius: 14px;
+      background: var(--code);
+      color: var(--code-ink);
       font-size: 13px;
-      line-height: 1.5;
-    }
-
-    .copy-btn {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      padding: 4px 8px;
-      font-size: 12px;
-      color: #57606a;
-      background: #fff;
-      border: 1px solid #d1d5da;
-      border-radius: 4px;
-      cursor: pointer;
-      opacity: 0;
-      transition: opacity 0.15s;
-    }
-
-    pre:hover .copy-btn {
-      opacity: 1;
-    }
-
-    .copy-btn:hover {
-      background: #f3f4f6;
-    }
-
-    .copy-btn.copied {
-      color: #1a7f37;
+      line-height: 1.65;
+      tab-size: 2;
     }
 
     code {
-      font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+      font-family: ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", monospace;
     }
 
-    p code {
-      background: #f6f8fa;
-      padding: 3px 6px;
-      border-radius: 4px;
+    p code,
+    td code {
+      padding: 2px 5px;
+      border-radius: 5px;
+      background: var(--surface-strong);
+      color: var(--ink);
+      font-size: 0.9em;
+    }
+
+    .copy-button {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      min-width: 58px;
+      padding: 6px 9px;
+      border: 1px solid #343840;
+      border-radius: 7px;
+      background: #24272d;
+      color: #dfe3ea;
+      cursor: pointer;
+      font: 600 12px ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    .copy-button:hover {
+      background: #30343c;
+    }
+
+    .note {
+      padding: 16px 18px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--surface);
+      color: var(--muted);
       font-size: 14px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      margin: 18px 0 28px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
     }
 
     table {
       width: 100%;
+      min-width: 640px;
       border-collapse: collapse;
-      margin: 16px 0;
       font-size: 14px;
     }
 
-    th, td {
+    th,
+    td {
+      padding: 13px 15px;
+      border-bottom: 1px solid var(--line);
       text-align: left;
-      padding: 10px 12px;
-      border-top: 1px solid #d1d5da;
+      vertical-align: top;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
     }
 
     th {
-      font-weight: 600;
-      background: #f6f8fa;
+      background: var(--surface);
+      font-size: 12px;
+      font-weight: 750;
+      letter-spacing: 0.02em;
     }
 
-    td code {
-      background: #f6f8fa;
-      padding: 2px 5px;
-      border-radius: 3px;
+    td {
+      color: var(--muted);
+    }
+
+    .site-footer {
+      display: flex;
+      min-height: 110px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      color: var(--muted);
       font-size: 13px;
     }
 
-    .footer {
-      margin-top: 64px;
-      padding-top: 24px;
-      border-top: 1px solid #d1d5da;
-      font-size: 13px;
-      color: #8b949e;
+    .site-footer a {
+      color: var(--ink);
+    }
+
+    @media (max-width: 760px) {
+      .shell {
+        width: min(calc(100% - 28px), var(--content));
+      }
+
+      .site-header {
+        min-height: 66px;
+      }
+
+      .brand-name,
+      .version,
+      .header-links a:first-child {
+        display: none;
+      }
+
+      .hero {
+        grid-template-columns: 1fr;
+        padding-top: 62px;
+      }
+
+      .hero h1 {
+        max-width: 9ch;
+        font-size: clamp(3.1rem, 15vw, 5rem);
+      }
+
+      .demo-frame {
+        width: min(88%, 360px);
+      }
+
+      .proof {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .proof-item:nth-child(3) {
+        border-left: 0;
+        border-top: 1px solid var(--line);
+      }
+
+      .proof-item:nth-child(4) {
+        border-top: 1px solid var(--line);
+      }
+
+      .section {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .section-heading {
+        position: static;
+      }
+
+      .feature-list {
+        grid-template-columns: 1fr;
+      }
+
+      .feature-list li:nth-child(even) {
+        padding-left: 0;
+        border-left: 0;
+      }
+
+      .site-footer {
+        align-items: flex-start;
+        flex-direction: column;
+        justify-content: center;
+        gap: 4px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      *,
+      *::before,
+      *::after {
+        transition-duration: 0.01ms !important;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>react-native-spoiler-view</h1>
-    <p class="description">Telegram-style spoiler effect for React Native. Tap to reveal content with native particle animation.</p>
+  <a class="skip-link" href="#content">Skip to content</a>
 
-    <div class="links">
+  <header class="shell site-header">
+    <a class="brand" href="#content" aria-label="react-native-spoiler-view home">
+      <span class="mark" aria-hidden="true">✦</span>
+      <span class="brand-name">react-native-spoiler-view</span>
+      <span class="version">v1.0.0</span>
+    </a>
+    <nav class="header-links" aria-label="Project links">
+      <a href="#install">Install</a>
       <a href="https://github.com/frzkn/react-native-spoiler-view">GitHub</a>
       <a href="https://www.npmjs.com/package/react-native-spoiler-view">npm</a>
+    </nav>
+  </header>
+
+  <main id="content">
+    <section class="shell hero">
+      <div class="hero-copy">
+        <h1>Spoilers that feel native.</h1>
+        <p class="lede">Telegram-style hidden content for React Native, rendered with native particles on iOS and Android. Your content stays real, accessible, and interactive after reveal.</p>
+        <div class="actions">
+          <a class="button primary" href="#install">Install v1.0.0</a>
+          <a class="button" href="https://github.com/frzkn/react-native-spoiler-view/tree/v1.0.0/example">View the example</a>
+        </div>
+      </div>
+      <div class="demo-frame">
+        <img src="https://raw.githubusercontent.com/frzkn/react-native-spoiler-view/v1.0.0/demo.webp" alt="Spoiler particles concealing chat messages and values in a bank statement" width="320" height="696">
+      </div>
+    </section>
+
+    <div class="shell proof" aria-label="Platform support">
+      <div class="proof-item"><strong>iOS</strong><span>Core Animation particles</span></div>
+      <div class="proof-item"><strong>Android</strong><span>Shared ambient texture work</span></div>
+      <div class="proof-item"><strong>Accessible</strong><span>VoiceOver and TalkBack aware</span></div>
+      <div class="proof-item"><strong>Bounded</strong><span>Particle work capped at runtime</span></div>
     </div>
 
-    <div class="demos">
-      <img src="_media/demo1.gif" alt="Demo" />
-      <img src="_media/demo2.gif" alt="Demo" />
-    </div>
+    <section class="shell section">
+      <div class="section-heading"><h2>Built for real content</h2></div>
+      <div>
+        <p>The spoiler effect sits above native sibling content instead of flattening it into a canvas snapshot. Hide a message, a few words, an account number, an image, or an entire custom view.</p>
+        <ul class="feature-list">
+          <li><strong>Touch-origin reveal</strong>A circular reveal begins exactly where the user taps.</li>
+          <li><strong>Ambient motion</strong>Three particle depth and opacity tiers move independently.</li>
+          <li><strong>Controlled or local</strong>Own reveal state in the parent or let the component manage it.</li>
+          <li><strong>Safe descendants</strong>Hidden content is blocked from touch and accessibility focus.</li>
+          <li><strong>Reduced Motion</strong>System animation preferences are respected on both platforms.</li>
+          <li><strong>Runtime limits</strong>Unsafe configuration is normalized and particle work stays bounded.</li>
+        </ul>
+      </div>
+    </section>
 
-    <ul class="features">
-      <li>Touch-origin circular reveal</li>
-      <li>Platform-native particle animations</li>
-      <li>Fully customizable</li>
-      <li>iOS and Android</li>
-    </ul>
+    <section class="shell section" id="install">
+      <div class="section-heading"><h2>Install</h2></div>
+      <div>
+        <h3>Package and native peers</h3>
+        <div class="code-wrap"><pre><code>npm install react-native-spoiler-view \
+  react-native-reanimated \
+  react-native-gesture-handler</code></pre></div>
+        <p>For Reanimated 4, also install <code>react-native-worklets</code> and put its Babel plugin last.</p>
+        <div class="code-wrap"><pre><code>npm install react-native-worklets</code></pre></div>
+        <div class="code-wrap"><pre><code>module.exports = {
+  presets: ['module:@react-native/babel-preset'],
+  plugins: ['react-native-worklets/plugin'],
+};</code></pre></div>
+        <p class="note">Choose peer dependency versions compatible with your React Native version. Reanimated 4 requires the New Architecture; Reanimated 3 remains the supported legacy lane.</p>
 
-    <h2>Installation</h2>
-    <pre><code class="language-bash">npm install react-native-spoiler-view</code></pre>
+        <h3>Compatibility</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Lane</th><th>React Native</th><th>React</th><th>Reanimated</th><th>Gesture Handler</th></tr></thead>
+            <tbody>
+              <tr><td>Legacy</td><td>0.73.x</td><td>18.x</td><td>3.15.5</td><td>2.18.x</td></tr>
+              <tr><td>Current</td><td>0.86.x</td><td>19.x</td><td>4.5.x + Worklets 0.10.x</td><td>3.x</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
 
-    <h3>Peer Dependencies</h3>
-    <pre><code class="language-bash">npm install react-native-reanimated react-native-gesture-handler</code></pre>
-    <p>Setup: <a href="https://docs.swmansion.com/react-native-reanimated/docs/fundamentals/getting-started">Reanimated</a> · <a href="https://docs.swmansion.com/react-native-gesture-handler/docs/fundamentals/installation">Gesture Handler</a></p>
+    <section class="shell section">
+      <div class="section-heading"><h2>Use it</h2></div>
+      <div>
+        <h3>Uncontrolled</h3>
+        <div class="code-wrap"><pre><code>import { Text } from 'react-native';
+import { SpoilerView } from 'react-native-spoiler-view';
 
-    <h2>Usage</h2>
+&lt;SpoilerView accessibilityRevealLabel="Hidden message"&gt;
+  &lt;Text&gt;This is a secret message.&lt;/Text&gt;
+&lt;/SpoilerView&gt;</code></pre></div>
+        <p>The component owns its state. Tapping toggles between hidden and revealed.</p>
 
-    <h3>Basic</h3>
-    <pre><code class="language-tsx">import { SpoilerView } from 'react-native-spoiler-view';
-
-&lt;SpoilerView&gt;
-  &lt;Text&gt;This is a secret message!&lt;/Text&gt;
-&lt;/SpoilerView&gt;</code></pre>
-
-    <h3>Controlled</h3>
-    <pre><code class="language-tsx">const [revealed, setRevealed] = useState(false);
+        <h3>Controlled</h3>
+        <div class="code-wrap"><pre><code>const [revealed, setRevealed] = useState(false);
 
 &lt;SpoilerView
   revealed={revealed}
   onReveal={() =&gt; setRevealed(true)}
+  onHide={() =&gt; setRevealed(false)}
+  accessibilityRevealLabel="Hidden account number"
 &gt;
-  &lt;Text&gt;Hidden until revealed&lt;/Text&gt;
-&lt;/SpoilerView&gt;
+  &lt;Text&gt;1234 5678 9012 3456&lt;/Text&gt;
+&lt;/SpoilerView&gt;</code></pre></div>
+        <p>Callbacks request the change; the component animates only when the controlled prop changes.</p>
 
-&lt;Button title="Reveal" onPress={() =&gt; setRevealed(true)} /&gt;</code></pre>
-
-    <h3>Custom Config</h3>
-    <pre><code class="language-tsx">&lt;SpoilerView
+        <h3>Custom particles</h3>
+        <div class="code-wrap"><pre><code>&lt;SpoilerView
   config={{
     particleCount: 300,
     particleColor: 'rgba(255, 100, 100, 1)',
+    particleSizeRange: [0.5, 1.5],
     revealDuration: 400,
   }}
 &gt;
   &lt;Image source={secretImage} /&gt;
-&lt;/SpoilerView&gt;</code></pre>
+&lt;/SpoilerView&gt;</code></pre></div>
+      </div>
+    </section>
 
-    <h2>Props</h2>
-    <table>
-      <tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr>
-      <tr><td><code>children</code></td><td>ReactNode</td><td>required</td><td>Content to hide</td></tr>
-      <tr><td><code>revealed</code></td><td>boolean</td><td>uncontrolled</td><td>Controlled reveal state</td></tr>
-      <tr><td><code>enabled</code></td><td>boolean</td><td>true</td><td>Enable tap gesture</td></tr>
-      <tr><td><code>onReveal</code></td><td>() =&gt; void</td><td>none</td><td>Reveal request callback</td></tr>
-      <tr><td><code>onHide</code></td><td>() =&gt; void</td><td>none</td><td>Hide request callback</td></tr>
-      <tr><td><code>config</code></td><td>Partial&lt;SpoilerConfig&gt;</td><td>none</td><td>Particle and animation overrides</td></tr>
-      <tr><td><code>style</code></td><td>StyleProp&lt;ViewStyle&gt;</td><td>none</td><td>Container style</td></tr>
-      <tr><td><code>accessibilityRevealLabel</code></td><td>string</td><td>Hidden content</td><td>Label announced while hidden</td></tr>
-      <tr><td><code>accessibilityRevealHint</code></td><td>string</td><td>Double tap to reveal</td><td>Reveal action hint</td></tr>
-      <tr><td><code>accessibilityHideLabel</code></td><td>string</td><td>Hide content</td><td>Action label exposed while revealed</td></tr>
-      <tr><td><code>accessibilityHideHint</code></td><td>string</td><td>Double tap to hide</td><td>Hide action hint</td></tr>
-    </table>
+    <section class="shell section">
+      <div class="section-heading"><h2>API</h2></div>
+      <div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>children</code></td><td><code>ReactNode</code></td><td>required</td><td>Content hidden by the spoiler</td></tr>
+              <tr><td><code>revealed</code></td><td><code>boolean</code></td><td>uncontrolled</td><td>Parent-owned reveal state</td></tr>
+              <tr><td><code>enabled</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Enables reveal and hide gestures</td></tr>
+              <tr><td><code>onReveal</code></td><td><code>() =&gt; void</code></td><td>—</td><td>Reveal request callback</td></tr>
+              <tr><td><code>onHide</code></td><td><code>() =&gt; void</code></td><td>—</td><td>Hide request callback</td></tr>
+              <tr><td><code>config</code></td><td><code>Partial&lt;SpoilerConfig&gt;</code></td><td>—</td><td>Particle and animation overrides</td></tr>
+              <tr><td><code>style</code></td><td><code>StyleProp&lt;ViewStyle&gt;</code></td><td>—</td><td>Container style</td></tr>
+            </tbody>
+          </table>
+        </div>
 
-    <h2>Config</h2>
-    <pre><code class="language-typescript">{
+        <h3>Default particle configuration</h3>
+        <div class="code-wrap"><pre><code>{
   particleCount: 180,
   particleDensity: 0.055,
   particleSizeRange: [0.45, 0.8],
@@ -278,33 +669,43 @@
   noiseSpeed: 0.3,
   driftAmount: 1,
   revealDuration: 500,
-}</code></pre>
+}</code></pre></div>
+        <p>Particle count is capped at 1,000. Providing <code>particleCount</code> without <code>particleDensity</code> opts into a fixed target; otherwise density adapts the effect to the spoiler area.</p>
+        <p><a href="https://github.com/frzkn/react-native-spoiler-view#props">Read the complete API and accessibility reference on GitHub →</a></p>
+      </div>
+    </section>
+  </main>
 
-    <div class="footer">MIT License</div>
-  </div>
-  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-markup.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-typescript.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-jsx.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-tsx.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-bash.min.js"></script>
+  <footer class="shell site-footer">
+    <span>react-native-spoiler-view v1.0.0 · MIT</span>
+    <span><a href="https://github.com/frzkn/react-native-spoiler-view/releases/tag/v1.0.0">Release notes</a> · <a href="https://github.com/frzkn/react-native-spoiler-view/issues">Issues</a></span>
+  </footer>
+
   <script>
-    document.querySelectorAll('pre').forEach(pre => {
-      const btn = document.createElement('button');
-      btn.className = 'copy-btn';
-      btn.textContent = 'Copy';
-      btn.onclick = () => {
-        const code = pre.querySelector('code').textContent;
-        navigator.clipboard.writeText(code).then(() => {
-          btn.textContent = 'Copied';
-          btn.classList.add('copied');
-          setTimeout(() => {
-            btn.textContent = 'Copy';
-            btn.classList.remove('copied');
-          }, 2000);
-        });
-      };
-      pre.appendChild(btn);
+    document.querySelectorAll('.code-wrap').forEach((wrapper) => {
+      const code = wrapper.querySelector('code');
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'copy-button';
+      button.textContent = 'Copy';
+      button.setAttribute('aria-label', 'Copy code to clipboard');
+
+      button.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(code.textContent);
+          button.textContent = 'Copied';
+          window.setTimeout(() => { button.textContent = 'Copy'; }, 1600);
+        } catch {
+          button.textContent = 'Select';
+          const range = document.createRange();
+          range.selectNodeContents(code);
+          const selection = window.getSelection();
+          selection.removeAllRanges();
+          selection.addRange(range);
+        }
+      });
+
+      wrapper.appendChild(button);
     });
   </script>
 </body>
